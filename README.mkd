@@ -1,0 +1,96 @@
+# MkDocs template with Material as a submodule
+This repo uses the static site generator **[MkDocs](https://www.mkdocs.org/)** and the theme **[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)** to generate a static website from Markdown files. If you would like GitHub to automatically build the site after every push to the master branch, have a look at the [Deploy MkDocs](https://github.com/marketplace/actions/deploy-mkdocs) GitHub action and the accompanying [mkdocs-template](https://github.com/mhausenblas/mkdocs-template).
+
+This template is a bit unusual since it contains the **theme as a Git submodule** instead of installing it via `pip`. This provides you with more control over the version of the theme.
+
+Have a look at this [blog post](https://makomi.net/posts/creating-a-website-with-mkdocs-and-material) if you would like to know how this repo was created and how MkDocs and Material can be configured. It also contains a list of [recommended plugins](https://makomi.net/posts/creating-a-website-with-mkdocs-and-material#recommended-plugins).
+
+If you are working with Git submodules for the first time, take a look at the introduction below that covers common use cases:
+
+
+## Working with Git submodules
+### Getting started
+Clone this Git repo and init as well as populate its submodule with content:
+```
+git clone --recurse-submodules https://github.com/makomi/mkdocs-template
+```
+
+### Updating the theme
+If you'd like to update the submodule to its latest version:
+```
+cd mkdocs-template
+git submodule update --remote --recursive
+```
+However, you usually want to update the theme to its latest release instead of the last commit on its master branch.
+For this, lookup the theme's [latest release](https://github.com/squidfunk/mkdocs-material/releases/latest/) number, e.g. `7.1.9`, and check it out:
+```
+cd mkdocs-material
+git pull
+git checkout 7.1.9
+cd ..
+```
+Commit the updated submodule:
+```
+git add mkdocs-material
+git commit -m "feat(material): Update theme to release 7.1.9"
+git push
+```
+Another Git user can then update his submodule to the version you committed:
+```
+git pull --recurse-submodules
+```
+
+
+## Previewing the site locally
+### Getting started
+```
+git clone --recurse-submodules http://github.com/makomi/mkdocs-template
+cd mkdocs-template
+pip install -r requirements.txt
+pip install -r mkdocs-material/requirements.txt
+```
+
+### Serving the site locally
+```
+mkdocs serve
+```
+Open [localhost:8000](localhost:8000).
+
+
+## Building the site locally for offline distribution
+[Official documentation](https://www.mkdocs.org/user-guide/deploying-your-docs/#local-files)
+
+Make the following changes in `mkdocs.yml` to obtain a `site` folder that can be viewed in a web browser without the need for any kind of web server:
+```
+site_url: ""               # instruct MkDocs to build the site so it works with the `file://` scheme
+use_directory_urls: false  # link to index.html files instead of directories
+plugins: []                # disable the search plugin
+```
+Afterwards, build the site:
+```
+mkdocs build -s -v
+```
+
+
+## Publishing the site on GitHub
+**Setting custom domain name**  
+[Official documentation](https://www.mkdocs.org/user-guide/deploying-your-docs/#custom-domains)
+```
+echo -n "example.com" > docs/CNAME
+```
+
+**Deploying the site**  
+[Official documentation](https://www.mkdocs.org/user-guide/deploying-your-docs/#project-pages)
+
+Build, commit to `gh-pages` branch, and push branch to Github:
+```
+mkdocs gh-deploy
+```
+
+## Publishing the site with other providers
+[Official documentation](https://www.mkdocs.org/user-guide/deploying-your-docs/#other-providers)
+```
+mkdocs build
+scp -r ./site user@host:/path/to/web_server/root
+```
+
